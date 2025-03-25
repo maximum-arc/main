@@ -50,7 +50,7 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Small ball (follower, at mouse)
+        // Small ball (follower, at mouse or touch)
         const mouseBall = {
             x: canvas.width / 2,
             y: canvas.height / 2,
@@ -115,6 +115,14 @@
             const rect = canvas.getBoundingClientRect();
             mouseBall.x = event.clientX - rect.left;
             mouseBall.y = event.clientY - rect.top;
+        });
+
+        // Touch move event for mobile
+        canvas.addEventListener("touchmove", (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches[0];
+            mouseBall.x = touch.clientX - rect.left;
+            mouseBall.y = touch.clientY - rect.top;
         });
 
         // Animation loop
