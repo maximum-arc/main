@@ -29,7 +29,7 @@
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
 
-        const pointCount = 10000; // Количество точек
+        const pointCount = 1000000; // Количество точек
         const points = [];
 
         // Генерация начальных точек
@@ -74,7 +74,7 @@
                 }
 
                 // Выполняем нагрузочные вычисления для каждой точки
-                heavyCalculation(500);
+                heavyCalculation(50000);
             });
         }
 
