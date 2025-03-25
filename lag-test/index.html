@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extreme Lag Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="lagTestCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("lagTestCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Canvas setup
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const pointCount = 10000; // Количество точек
+        const points = [];
+
+        // Генерация начальных точек
+        for (let i = 0; i < pointCount; i++) {
+            const angle = Math.random() * Math.PI * 2; // Случайный угол
+            const distance = Math.random() * 300; // Случайное расстояние
+            points.push({
+                x: Math.sin(angle) * distance,
+                y: Math.cos(angle) * distance,
+                speed: Math.random() * 5 + 1, // Скорость удаления от центра
+                size: Math.random() * 2 + 1,
+                color: `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
+            });
+        }
+
+        // Нагрузка на процессор
+        function heavyCalculation(iterations) {
+            let result = 0;
+            for (let i = 0; i < iterations; i++) {
+                result += Math.sin(i) * Math.cos(i) * Math.tan(i % Math.PI);
+            }
+            return result;
+        }
+
+        // Обновление точек
+        function updatePoints() {
+            points.forEach((point, index) => {
+                // Увеличиваем расстояние точки от центра
+                point.x += (point.x / 50) * point.speed;
+                point.y += (point.y / 50) * point.speed;
+
+                // Если точка выходит за границы, возвращаем её в центр
+                if (
+                    Math.abs(point.x) > canvas.width ||
+                    Math.abs(point.y) > canvas.height
+                ) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 300;
+                    point.x = Math.sin(angle) * distance;
+                    point.y = Math.cos(angle) * distance;
+                    point.speed = Math.random() * 5 + 1;
+                }
+
+                // Выполняем нагрузочные вычисления для каждой точки
+                heavyCalculation(500);
+            });
+        }
+
+        // Рисование точек
+        function drawPoints() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            points.forEach((point) => {
+                ctx.beginPath();
+                ctx.arc(centerX + point.x, centerY + point.y, point.size, 0, Math.PI * 2);
+                ctx.fillStyle = point.color;
+                ctx.fill();
+            });
+        }
+
+        // Анимация
+        function animate() {
+            updatePoints();
+            drawPoints();
+            requestAnimationFrame(animate);
+        }
+
+        // Запуск анимации
+        animate();
+    </script>
+</body>
+</html>
