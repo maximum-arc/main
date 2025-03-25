@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad</title>
+    <title>Enhanced Notepad</title>
     <style>
         body {
             margin: 0;
@@ -19,7 +19,7 @@
         }
         textarea {
             width: 80%;
-            height: 70%;
+            height: 60%;
             font-size: 16px;
             background-color: #333;
             color: white;
@@ -28,8 +28,12 @@
             padding: 10px;
             resize: none;
         }
-        button {
+        .button-container {
             margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
             padding: 10px 20px;
             font-size: 16px;
             background-color: rgba(60, 60, 60, 0.9);
@@ -45,9 +49,37 @@
     </style>
 </head>
 <body>
-    <textarea placeholder="Write your notes here..."></textarea>
-    <button onclick="goBack()">Back to Main Site</button>
+    <textarea id="textArea" placeholder="Write your notes here..."></textarea>
+    <div class="button-container">
+        <button onclick="capitalizeText()">Capitalize Text</button>
+        <button onclick="fixCapitalization()">Fix Capitalization After Period</button>
+        <button onclick="clearText()">Clear Text</button>
+        <button onclick="goBack()">Back to Main Site</button>
+    </div>
     <script>
+        const textArea = document.getElementById("textArea");
+
+        // Функция для заглавных букв
+        function capitalizeText() {
+            const text = textArea.value;
+            textArea.value = text
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+        }
+
+        // Функция для исправления текста после точки
+        function fixCapitalization() {
+            const text = textArea.value;
+            textArea.value = text.replace(/(\. *)([a-zа-яё])/g, (match, p1, p2) => `${p1}${p2.toUpperCase()}`);
+        }
+
+        // Функция для очистки текста
+        function clearText() {
+            textArea.value = '';
+        }
+
+        // Функция возврата на основной сайт
         function goBack() {
             window.location.href = "https://maximum-arc.github.io/main/";
         }
