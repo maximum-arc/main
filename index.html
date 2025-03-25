@@ -3,21 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Website</title>
+    <title>Interactive Sphere</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #eee;
             text-align: center;
             margin: 0;
             padding: 0;
         }
-        h1 {
-            color: #333;
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background: radial-gradient(circle, #333, #000);
+            border: 1px solid #fff;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #666;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is a simple page that works as a blank template.</p>
+    <h1>3D Rotating Sphere</h1>
+    <canvas id="sphereCanvas" width="300" height="300"></canvas>
+    <button onclick="redirect()">Go to Lag Test</button>
+    <script>
+        const canvas = document.getElementById('sphereCanvas');
+        const ctx = canvas.getContext('2d');
+        let angleX = 0;
+        let angleY = 0;
+
+        function drawSphere() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const radius = 100;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            for (let phi = 0; phi < Math.PI * 2; phi += 0.3) {
+                for (let theta = 0; theta < Math.PI; theta += 0.3) {
+                    const x = centerX + radius * Math.sin(theta) * Math.cos(phi + angleX);
+                    const y = centerY + radius * Math.sin(theta) * Math.sin(phi + angleY);
+
+                    const brightness = Math.sin(theta) * 255;
+                    ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                    ctx.fillRect(x, y, 2, 2);
+                }
+            }
+            angleX += 0.03;
+            angleY += 0.03;
+        }
+
+        function animate() {
+            drawSphere();
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        function redirect() {
+            window.location.href = "https://maximum-arc.github.io/main/lag-test";
+        }
+    </script>
 </body>
 </html>
