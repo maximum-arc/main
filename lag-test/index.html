@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extreme Lag Test</title>
+    <title>Extreme 3D Lag Test</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #000;
+            background-color: #000;
             overflow: hidden;
         }
         canvas {
@@ -28,63 +28,83 @@
 
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-
-        const pointCount = 1000000; // Количество точек
+        const perspectiveDistance = 500; // Расстояние до "камеры"
+        const pointCount = 200000; // Количество точек для теста
         const points = [];
 
-        // Генерация начальных точек
+        const rotationSpeedX = 0.01; // Скорость вращения по оси X
+        const rotationSpeedY = 0.01; // Скорость вращения по оси Y
+        let angleX = 0; // Угол вращения по X
+        let angleY = 0; // Угол вращения по Y
+
+        // Генерация множества точек в 3D-пространстве
         for (let i = 0; i < pointCount; i++) {
-            const angle = Math.random() * Math.PI * 2; // Случайный угол
-            const distance = Math.random() * 300; // Случайное расстояние
+            const radius = Math.random() * 300 + 50; // Радиус от центра
+            const theta = Math.random() * Math.PI * 2; // Угол в радианах для X и Y
+            const phi = Math.random() * Math.PI * 2; // Угол в радианах для Z
+
+            const x = radius * Math.sin(phi) * Math.cos(theta);
+            const y = radius * Math.sin(phi) * Math.sin(theta);
+            const z = radius * Math.cos(phi);
+
             points.push({
-                x: Math.sin(angle) * distance,
-                y: Math.cos(angle) * distance,
-                speed: Math.random() * 5 + 1, // Скорость удаления от центра
-                size: Math.random() * 2 + 1,
-                color: `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
+                x,
+                y,
+                z,
+                size: Math.random() * 3 + 1, // Размер точки
+                distance: radius, // Расстояние до центра для цвета
             });
         }
 
-        // Нагрузка на процессор
-        function heavyCalculation(iterations) {
-            let result = 0;
-            for (let i = 0; i < iterations; i++) {
-                result += Math.sin(i) * Math.cos(i) * Math.tan(i % Math.PI);
-            }
-            return result;
+        // Функция для вращения точек вокруг осей
+        function rotatePoint(point, angleX, angleY) {
+            let { x, y, z } = point;
+
+            // Вращение вокруг оси X
+            const cosX = Math.cos(angleX);
+            const sinX = Math.sin(angleX);
+            const y1 = y * cosX - z * sinX;
+            const z1 = y * sinX + z * cosX;
+            y = y1;
+            z = z1;
+
+            // Вращение вокруг оси Y
+            const cosY = Math.cos(angleY);
+            const sinY = Math.sin(angleY);
+            const x1 = x * cosY + z * sinY;
+            const z2 = -x * sinY + z * cosY;
+            x = x1;
+            z = z2;
+
+            return { x, y, z };
         }
 
         // Обновление точек
         function updatePoints() {
-            points.forEach((point, index) => {
-                // Увеличиваем расстояние точки от центра
-                point.x += (point.x / 50) * point.speed;
-                point.y += (point.y / 50) * point.speed;
-
-                // Если точка выходит за границы, возвращаем её в центр
-                if (
-                    Math.abs(point.x) > canvas.width ||
-                    Math.abs(point.y) > canvas.height
-                ) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = Math.random() * 300;
-                    point.x = Math.sin(angle) * distance;
-                    point.y = Math.cos(angle) * distance;
-                    point.speed = Math.random() * 5 + 1;
-                }
-
-                // Выполняем нагрузочные вычисления для каждой точки
-                heavyCalculation(50000);
+            points.forEach(point => {
+                const rotated = rotatePoint(point, rotationSpeedX, rotationSpeedY);
+                point.x = rotated.x;
+                point.y = rotated.y;
+                point.z = rotated.z;
             });
         }
 
         // Рисование точек
         function drawPoints() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            points.forEach((point) => {
+            points.forEach(point => {
+                const perspective = perspectiveDistance / (perspectiveDistance - point.z);
+                const screenX = centerX + point.x * perspective;
+                const screenY = centerY - point.y * perspective;
+
+                // Вычисление цвета на основе расстояния
+                const colorIntensity = Math.min(point.distance / 300, 1); // Нормализация в диапазон [0, 1]
+                const red = Math.round(255 * colorIntensity); // Чем дальше, тем больше красного
+                const white = Math.round(255 * (1 - colorIntensity)); // Чем ближе, тем больше белого
+
                 ctx.beginPath();
-                ctx.arc(centerX + point.x, centerY + point.y, point.size, 0, Math.PI * 2);
-                ctx.fillStyle = point.color;
+                ctx.arc(screenX, screenY, Math.max(point.size * perspective, 0.1), 0, Math.PI * 2);
+                ctx.fillStyle = `rgb(${red}, ${white}, ${white})`; // Цвет на основе расстояния
                 ctx.fill();
             });
         }
