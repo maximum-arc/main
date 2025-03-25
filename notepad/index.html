@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        textarea {
+            width: 80%;
+            height: 70%;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            resize: none;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: rgba(60, 60, 60, 0.9);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: rgba(80, 80, 80, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <textarea placeholder="Write your notes here..."></textarea>
+    <button onclick="goBack()">Back to Main Site</button>
+    <script>
+        function goBack() {
+            window.location.href = "https://maximum-arc.github.io/main/";
+        }
+    </script>
+</body>
+</html>
