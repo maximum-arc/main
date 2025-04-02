@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Metadata Editor</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .editor {
+            width: 300px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            height: 40px;
+            background-color: #444;
+            color: white;
+            font-size: 16px;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #555;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #777;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor">
+        <h2>MP3 Metadata Editor</h2>
+        <div class="input-group">
+            <label for="file">MP3 File Path:</label>
+            <input type="text" id="file" placeholder="Enter path to .mp3 file">
+        </div>
+        <div class="input-group">
+            <label for="artist">Artist:</label>
+            <input type="text" id="artist" placeholder="Enter artist name">
+        </div>
+        <div class="input-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" placeholder="Enter title">
+        </div>
+        <button onclick="updateMetadata()">Update Metadata</button>
+        <div id="result" class="result"></div>
+    </div>
+    <script>
+        function updateMetadata() {
+            const file = document.getElementById("file").value;
+            const artist = document.getElementById("artist").value;
+            const title = document.getElementById("title").value;
+
+            if (!file.endsWith(".mp3")) {
+                document.getElementById("result").textContent = "Invalid file type. Must be .mp3";
+                return;
+            }
+
+            fetch("/update-metadata", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ file, artist, title })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").textContent = data.message;
+            })
+            .catch(error => {
+                document.getElementById("result").textContent = "Error: " + error.message;
+            });
+        }
+    </script>
+</body>
+</html>
