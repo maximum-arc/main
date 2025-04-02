@@ -32,7 +32,7 @@
             margin-bottom: 5px;
             font-size: 14px;
         }
-        input {
+        input[type="text"], input[type="file"] {
             width: 100%;
             height: 40px;
             background-color: #444;
@@ -69,8 +69,8 @@
     <div class="editor">
         <h2>MP3 Metadata Editor</h2>
         <div class="input-group">
-            <label for="file">MP3 File Path:</label>
-            <input type="text" id="file" placeholder="Enter path to .mp3 file">
+            <label for="file">Select MP3 File:</label>
+            <input type="file" id="file" accept=".mp3">
         </div>
         <div class="input-group">
             <label for="artist">Artist:</label>
@@ -85,21 +85,30 @@
     </div>
     <script>
         function updateMetadata() {
-            const file = document.getElementById("file").value;
+            const fileInput = document.getElementById("file");
             const artist = document.getElementById("artist").value;
             const title = document.getElementById("title").value;
 
-            if (!file.endsWith(".mp3")) {
-                document.getElementById("result").textContent = "Invalid file type. Must be .mp3";
+            if (!fileInput.files.length) {
+                document.getElementById("result").textContent = "Please select an MP3 file.";
                 return;
             }
 
+            const file = fileInput.files[0];
+
+            if (file.type !== "audio/mpeg") {
+                document.getElementById("result").textContent = "Invalid file type. Must be .mp3.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("artist", artist);
+            formData.append("title", title);
+
             fetch("/update-metadata", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ file, artist, title })
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
