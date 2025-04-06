@@ -1,0 +1,71 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>Учебная форма - Уровни защиты</title>  
+    <style>  
+        .unsafe { border: 2px solid red; }  
+        .medium { border: 2px solid orange; }  
+        .super-safe { border: 2px solid green; }  
+    </style>  
+</head>  
+<body>  
+    <!-- Демонстрация для курса "Веб-безопасность" -->  
+    <h3>Тестовый чат (Educational PoC)</h3>  
+    
+    <form onsubmit="return handleSubmit(event)">  
+        <!-- 1. Незащищенное поле -->  
+        <input type="text" id="unsafeInput" class="unsafe"  
+               placeholder="Без валидации">  
+        
+        <!-- 2. Базовая защита -->  
+        <input type="text" id="mediumInput" class="medium"  
+               maxlength="30"  
+               placeholder="Фильтр тегов">  
+        
+        <!-- 3. Строгая защита -->  
+        <input type="text" id="safeInput" class="super-safe"  
+               pattern="[A-Za-z0-9\s]+"  
+               placeholder="Только буквы/цифры">  
+        
+        <button type="submit">Отправить (тест)</button>  
+    </form>  
+
+    <script>  
+        // Учебные методы обработки  
+        function handleSubmit(e) {  
+            e.preventDefault();  
+
+            // 1. Незащищенный ввод  
+            const unsafe = document.getElementById('unsafeInput').value;  
+            
+            // 2. Базовый фильтр  
+            let medium = document.getElementById('mediumInput').value;  
+            medium = medium.replace(/</g, '&lt;').replace(/>/g, '&gt;');  
+            
+            // 3. Строгая валидация  
+            const safe = document.getElementById('safeInput').value;  
+            if (!/^[A-Za-z0-9\s]+$/.test(safe)) {  
+                alert("Недопустимые символы!");  
+                return;  
+            }  
+
+            // Тестовый вывод  
+            console.log({  
+                unsafe: unsafe,  
+                medium: medium,  
+                safe: encodeURIComponent(safe)  
+            });  
+        }  
+    </script>  
+
+    <!-- Предупреждение для учебных целей -->  
+    <div style="color: grey; margin-top: 20px;">  
+        ВНИМАНИЕ: Это демо-стенд. Реальная защита требует:  
+        <ul>  
+            <li>Валидации на сервере (Node.js/PHP)</li>  
+            <li>CSP-заголовков</li>  
+            <li>WAF (Cloudflare)</li>  
+        </ul>  
+    </div>  
+</body>  
+</html>  
