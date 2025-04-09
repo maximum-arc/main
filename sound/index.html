@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой сайт со звуком</title>
+</head>
+<body>
+    <h1>Сайт с фоновой музыкой</h1>
+    
+    <!-- Аудиоплеер (скрытый) -->
+    <audio id="myAudio" controls loop style="display: none;">
+        <source src="sound.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <button onclick="playSound()">▶ Включить звук</button>
+
+    <script>
+        function playSound() {
+            const audio = document.getElementById("myAudio");
+            audio.volume = 0.5; // Громкость 50%
+            audio.play()
+                .then(() => console.log("Звук запущен!"))
+                .catch(e => console.error("Ошибка:", e));
+        }
+        
+        // Если нужно автовоспроизведение (но браузеры могут блокировать)
+        window.onload = function() {
+            // playSound();  // Раскомментируйте, если хотите попробовать автозапуск
+        };
+    </script>
+</body>
+</html>
