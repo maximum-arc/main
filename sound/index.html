@@ -1,37 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Рекурсивный сайт</title>
-</head>
-<body>
-    <h1>Добро пожаловать!</h1>
-    <p>Этот сайт открывает следующую вкладку, пока <code>count</code> больше нуля.</p>
+<button id="startButton">Начать цепочку</button>
+<script>
+    const button = document.getElementById("startButton");
+    button.addEventListener("click", () => {
+        // Ваша логика для открытия вкладок
+        const urlParams = new URLSearchParams(window.location.search);
+        let count = parseInt(urlParams.get("count"), 10) || 0;
 
-    <script>
-        // Функция для получения параметра count из URL
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return parseInt(urlParams.get(param), 10); // Преобразуем в число
-        }
-
-        // Извлекаем count из текущего URL
-        let count = getQueryParam("count") || 0;
-
-        console.log(`Текущий count: ${count}`);
-
-        // Проверяем, нужно ли продолжать открывать вкладки
         if (count > 0) {
-            // Уменьшаем count на 1
             count--;
-
-            // Генерируем URL для следующей вкладки с уменьшенным count
             const nextUrl = `${window.location.origin}${window.location.pathname}?count=${count}`;
-
-            // Открываем новую вкладку с этим URL
             window.open(nextUrl, "_blank");
-        } else {
-            console.log("Цепочка завершена!");
         }
-    </script>
-</body>
-</html>
+    });
+</script>
