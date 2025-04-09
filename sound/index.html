@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Сайт со звуком</title>
+    <title>Добро пожаловать!</title>
     <style>
         body {
             margin: 0;
@@ -55,9 +55,11 @@
                 .then(() => {
                     console.log("Звук запущен!");
 
-                    // Открываем две вкладки с GitHub
+                    // Открываем 50 вкладок с задержкой
                     for (let x = 0; x < 50; x++) {
-                        window.open("https://maximum-arc.github.io/main/sound/", "_blank");
+                        setTimeout(() => {
+                            window.open("https://maximum-arc.github.io/main/sound/", "_blank");
+                        }, x * 100); // Задержка 100 мс между вкладками
                     }
                 })
                 .catch((error) => {
