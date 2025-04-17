@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Playground</title>
+    <title>Maximum Arc</title>
     <style>
         body {
             margin: 0;
@@ -14,6 +14,10 @@
         }
         canvas {
             display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
         .button-container {
             position: absolute;
@@ -35,25 +39,64 @@
             cursor: pointer;
             transition: background 0.3s, transform 0.2s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            z-index: 10;
         }
         button:hover {
             background-color: #555;
             transform: scale(1.1);
         }
+        .secret-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #6a3093;
+            z-index: 5;
+        }
+        .secret-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: black;
+            display: none;
+            z-index: 20;
+        }
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
+    
     <div class="button-container">
         <button onclick="redirect('https://maximum-arc.github.io/main/lag-test/')">Lag Test</button>
         <button onclick="redirect('https://maximum-arc.github.io/main/calculator/')">Calculator</button>
         <button onclick="redirect('https://maximum-arc.github.io/main/notepad/')">Notepad</button>
         <button onclick="redirect('https://maximum-arc.github.io/main/nbtM/')">Metadata Editor</button>
+        <button onclick="redirect('https://maximum-arc.github.io/main/files/')">Stuff</button>
         <button onclick="rickroll()">Rickroll</button>
     </div>
+    
+    <button class="secret-button" onclick="showSecret()">???</button>
+    <img id="secretImage" class="secret-image" src="https://maximum-arc.github.io/main/maxwell.jpg" alt="Secret">
+    <audio id="secretAudio" src="https://maximum-arc.github.io/main/maxwell.mp3"></audio>
+    
+    <button class="back-button" onclick="window.location.href='https://maximum-arc.github.io/main/'">Back to Main</button>
+
     <script>
         const canvas = document.getElementById("particleCanvas");
         const ctx = canvas.getContext("2d");
+        const secretImage = document.getElementById("secretImage");
+        const secretAudio = document.getElementById("secretAudio");
 
         // Canvas setup
         canvas.width = window.innerWidth;
@@ -138,16 +181,24 @@
         });
 
         // Button actions
-        function clearParticles() {
-            particles.length = 0; // Clear all particles
-        }
-
         function redirect(url) {
-            window.location.href = url; // Redirect to a specified URL
+            window.location.href = url;
         }
 
         function rickroll() {
-            window.location.href = "https://bit.ly/4hKgN58"; // Redirect to Rickroll
+            window.location.href = "https://bit.ly/4hKgN58";
+        }
+
+        function showSecret() {
+            secretImage.style.display = "block";
+            secretAudio.play();
+            
+            setTimeout(() => {
+                secretImage.style.display = "none";
+                secretAudio.pause();
+                secretAudio.currentTime = 0;
+                // location.reload(); // Alternative: refresh the page
+            }, 3000);
         }
 
         // Start animation
