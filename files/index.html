@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maximum Arc - Files</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #1a1a1a;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            margin: 0;
+            color: #6a3093;
+        }
+        .file-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .file-item:hover {
+            background-color: #3d3d3d;
+        }
+        .file-name {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        .file-icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        .download-btn {
+            background-color: #6a3093;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        .download-btn:hover {
+            background-color: #8e44ad;
+        }
+        .back-btn {
+            margin-top: 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #555;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Maximum Arc - Files</h1>
+    </header>
+    
+    <div class="file-container">
+        <div class="file-item">
+            <div class="file-name">
+                <i class="fas fa-file-archive file-icon"></i>
+                EV.zip
+            </div>
+            <a href="https://maximum-arc.github.io/main/files/EV.zip" class="download-btn" download>
+                <i class="fas fa-download"></i> Download
+            </a>
+        </div>
+        
+        <div class="file-item">
+            <div class="file-name">
+                <i class="fas fa-file-archive file-icon"></i>
+                BB.zip
+            </div>
+            <a href="https://maximum-arc.github.io/main/files/BB.zip" class="download-btn" download>
+                <i class="fas fa-download"></i> Download
+            </a>
+        </div>
+    </div>
+    
+    <button class="back-btn" onclick="window.location.href='https://maximum-arc.github.io/main/'">
+        <i class="fas fa-arrow-left"></i> Back to Main
+    </button>
+</body>
+</html>
