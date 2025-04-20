@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Догонялки</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        #gameArea {
+            width: 600px;
+            height: 400px;
+            background: #333;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #444;
+        }
+        .player {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.2s;
+        }
+        #hunter {
+            background: red;
+        }
+        #runner {
+            background: blue;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        #status {
+            margin: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>P2P Догонялки</h1>
+    
+    <div id="connectScreen">
+        <input type="text" id="peerIdInput" placeholder="ID друга (оставьте пустым если вы первый)">
+        <button onclick="connect()">Подключиться</button>
+        <p id="myId">Ваш ID: ...</p>
+    </div>
+    
+    <div id="gameScreen" style="display:none">
+        <div id="status">Ожидание подключения...</div>
+        <div id="gameArea">
+            <div id="hunter" class="player"></div>
+            <div id="runner" class="player"></div>
+        </div>
+        <p>Управление: WASD (движение)</p>
+    </div>
+
+    <script>
+        // Основные переменные
+        let peer;
+        let conn;
+        let currentRole = null;
+        let keysPressed = {};
+        let gameLoop;
+        let isHost = false;
+        
+        // Настройки игры
+        const HUNTER_SPEED = 5;
+        const RUNNER_SPEED = 4;
+
+        // Подключение к PeerJS
+        function connect() {
+            const friendId = document.getElementById('peerIdInput').value.trim();
+            
+            peer = new Peer();
+            isHost = friendId === '';
+            
+            peer.on('open', (id) => {
+                document.getElementById('myId').textContent = `Ваш ID: ${id}`;
+                
+                if (friendId) {
+                    // Подключаемся к другу
+                    conn = peer.connect(friendId);
+                    setupConnection();
+                    document.getElementById('status').textContent = "Подключаемся к другу...";
+                } else {
+                    // Ждем когда друг подключится
+                    document.getElementById('status').textContent = `Ожидаем подключения друга... (Ваш ID: ${id})`;
+                }
+            });
+            
+            // Когда кто-то подключается к нам
+            peer.on('connection', (connection) => {
+                if (!conn) {
+                    conn = connection;
+                    setupConnection();
+                }
+            });
+            
+            document.getElementById('connectScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+        }
+
+        // Настройка соединения
+        function setupConnection() {
+            conn.on('data', (data) => {
+                if (data.type === 'game') {
+                    handleGameData(data);
+                } else if (data.type === 'init') {
+                    // Определяем роли
+                    currentRole = data.role;
+                    startGame();
+                }
+            });
+            
+            conn.on('open', () => {
+                // Рандомно выбираем охотника
+                const roles = ['hunter', 'runner'];
+                const randomRole = roles[Math.floor(Math.random() * roles.length)];
+                
+                if (isHost) {
+                    currentRole = randomRole;
+                    conn.send({ 
+                        type: 'init', 
+                        role: randomRole === 'hunter' ? 'runner' : 'hunter' 
+                    });
+                }
+                
+                startGame();
+            });
+        }
+
+        // Начало игры
+        function startGame() {
+            document.getElementById('status').textContent = 
+                `Вы ${currentRole === 'hunter' ? 'ОХОТНИК (красный)' : 'УБЕГАЮЩИЙ (синий)'}`;
+            
+            // Позиционируем игроков
+            positionPlayers();
+            
+            // Обработка клавиш
+            document.addEventListener('keydown', (e) => {
+                keysPressed[e.key.toLowerCase()] = true;
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keysPressed[e.key.toLowerCase()] = false;
+            });
+            
+            // Запускаем игровой цикл
+            gameLoop = setInterval(updateGame, 1000/60);
+        }
+
+        // Игровой цикл
+        function updateGame() {
+            if (!conn) return;
+            
+            const player = currentRole === 'hunter' ? 'hunter' : 'runner';
+            const playerEl = document.getElementById(player);
+            const speed = currentRole === 'hunter' ? HUNTER_SPEED : RUNNER_SPEED;
+            
+            let dx = 0, dy = 0;
+            
+            if (keysPressed['w']) dy = -speed;
+            if (keysPressed['s']) dy = speed;
+            if (keysPressed['a']) dx = -speed;
+            if (keysPressed['d']) dx = speed;
+            
+            movePlayer(playerEl, dx, dy);
+            sendPosition();
+        }
+
+        // Движение игрока
+        function movePlayer(player, dx, dy) {
+            if (!player) return;
+            
+            const rect = document.getElementById('gameArea').getBoundingClientRect();
+            let x = parseInt(player.style.left || '0');
+            let y = parseInt(player.style.top || '0');
+            
+            x = Math.max(0, Math.min(rect.width - 30, x + dx));
+            y = Math.max(0, Math.min(rect.height - 30, y + dy));
+            
+            player.style.left = x + 'px';
+            player.style.top = y + 'px';
+            
+            checkCollision();
+        }
+
+        // Проверка столкновения
+        function checkCollision() {
+            const hunter = document.getElementById('hunter');
+            const runner = document.getElementById('runner');
+            
+            if (!hunter || !runner) return;
+            
+            const hunterRect = hunter.getBoundingClientRect();
+            const runnerRect = runner.getBoundingClientRect();
+            
+            if (
+                hunterRect.left < runnerRect.right &&
+                hunterRect.right > runnerRect.left &&
+                hunterRect.top < runnerRect.bottom &&
+                hunterRect.bottom > runnerRect.top
+            ) {
+                swapRoles();
+            }
+        }
+
+        // Смена ролей
+        function swapRoles() {
+            currentRole = currentRole === 'hunter' ? 'runner' : 'hunter';
+            document.getElementById('status').textContent = 
+                `Вы ${currentRole === 'hunter' ? 'ОХОТНИК (красный)' : 'УБЕГАЮЩИЙ (синий)'}`;
+            
+            conn.send({
+                type: 'game',
+                action: 'swapRoles'
+            });
+            
+            positionPlayers();
+        }
+
+        // Позиционирование игроков
+        function positionPlayers() {
+            const gameArea = document.getElementById('gameArea');
+            const hunter = document.getElementById('hunter');
+            const runner = document.getElementById('runner');
+            
+            if (!hunter || !runner) return;
+            
+            if (currentRole === 'hunter') {
+                hunter.style.left = '100px';
+                hunter.style.top = '100px';
+                runner.style.left = '400px';
+                runner.style.top = '300px';
+            } else {
+                hunter.style.left = '400px';
+                hunter.style.top = '100px';
+                runner.style.left = '100px';
+                runner.style.top = '300px';
+            }
+        }
+
+        // Отправка позиции
+        function sendPosition() {
+            if (!conn) return;
+            
+            const player = currentRole === 'hunter' ? 'hunter' : 'runner';
+            const element = document.getElementById(player);
+            
+            if (!element) return;
+            
+            conn.send({
+                type: 'game',
+                action: 'position',
+                player: player,
+                x: parseInt(element.style.left || '0'),
+                y: parseInt(element.style.top || '0')
+            });
+        }
+
+        // Обработка игровых данных
+        function handleGameData(data) {
+            if (data.action === 'position') {
+                const player = document.getElementById(data.player);
+                if (player) {
+                    player.style.left = data.x + 'px';
+                    player.style.top = data.y + 'px';
+                }
+            } else if (data.action === 'swapRoles') {
+                currentRole = currentRole === 'hunter' ? 'runner' : 'hunter';
+                document.getElementById('status').textContent = 
+                    `Вы ${currentRole === 'hunter' ? 'ОХОТНИК (красный)' : 'УБЕГАЮЩИЙ (синий)'}`;
+                positionPlayers();
+            }
+        }
+    </script>
+</body>
+</html>
