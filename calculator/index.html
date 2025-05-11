@@ -3,104 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <title>Neon Calculator</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff00;
+        }
+        
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #282c34;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #000;
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
         }
-        .calculator {
-            width: 300px;
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-        }
-        .display {
-            width: 100%;
-            height: 50px;
-            background-color: #444;
-            color: white;
+        
+        .title {
+            color: var(--neon-pink);
             font-size: 24px;
-            border: none;
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-bottom: 20px;
+            animation: glow 1.5s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px var(--neon-pink); }
+            to { text-shadow: 0 0 20px var(--neon-pink), 0 0 30px var(--neon-purple); }
+        }
+        
+        .calculator {
+            width: 320px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.3);
+        }
+        
+        .display {
+            width: calc(100% - 20px);
+            height: 60px;
+            background-color: rgba(20, 20, 20, 0.8);
+            color: var(--neon-green);
+            font-size: 28px;
+            border: 2px solid var(--neon-purple);
             text-align: right;
             padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.3);
         }
+        
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
+        
         button {
             padding: 20px;
-            font-size: 16px;
-            background-color: #555;
-            border: none;
-            color: white;
-            border-radius: 5px;
+            font-size: 18px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            font-family: 'Press Start 2P', cursive;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
         }
+        
         button:hover {
-            background-color: #777;
+            background-color: rgba(0, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        
+        button.operator {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+        
+        button.operator:hover {
+            background-color: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+        
+        button.equals {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            grid-column: span 2;
+        }
+        
+        button.equals:hover {
+            background-color: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+        
+        button.clear {
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
+        }
+        
+        button.clear:hover {
+            background-color: rgba(106, 48, 147, 0.1);
+            box-shadow: 0 0 15px var(--neon-purple);
         }
     </style>
 </head>
 <body>
+    <div class="title">NEON CALCULATOR</div>
     <div class="calculator">
         <input class="display" id="display" readonly>
         <div class="buttons">
             <button onclick="appendValue('7')">7</button>
             <button onclick="appendValue('8')">8</button>
             <button onclick="appendValue('9')">9</button>
-            <button onclick="appendValue('/')">/</button>
+            <button class="operator" onclick="appendValue('/')">/</button>
             <button onclick="appendValue('4')">4</button>
             <button onclick="appendValue('5')">5</button>
             <button onclick="appendValue('6')">6</button>
-            <button onclick="appendValue('*')">*</button>
+            <button class="operator" onclick="appendValue('*')">*</button>
             <button onclick="appendValue('1')">1</button>
             <button onclick="appendValue('2')">2</button>
             <button onclick="appendValue('3')">3</button>
-            <button onclick="appendValue('-')">-</button>
+            <button class="operator" onclick="appendValue('-')">-</button>
             <button onclick="appendValue('0')">0</button>
             <button onclick="appendValue('.')">.</button>
-            <button onclick="calculate()">=</button>
-            <button onclick="appendValue('+')">+</button>
-            <button onclick="clearDisplay()">C</button>
+            <button class="equals" onclick="calculate()">=</button>
+            <button class="operator" onclick="appendValue('+')">+</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
         </div>
     </div>
-    <button onclick="goBack()">Back to Main Site</button>
     <script>
         const display = document.getElementById("display");
 
         function appendValue(value) {
             display.value += value;
+            // Play click sound
+            const click = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-modern-click-box-check-1120.mp3');
+            click.play();
         }
 
         function clearDisplay() {
             display.value = "";
+            // Play clear sound
+            const clearSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3');
+            clearSound.play();
         }
 
         function calculate() {
             try {
-                display.value = eval(display.value);
+                const result = eval(display.value);
+                display.value = result;
+                // Play success sound
+                const success = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3');
+                success.play();
             } catch (error) {
                 display.value = "Error";
+                // Play error sound
+                const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
+                errorSound.play();
             }
-        }
-
-        function goBack() {
-            window.location.href = "https://maximum-arc.github.io/main/";
         }
     </script>
 </body>
