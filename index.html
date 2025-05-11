@@ -3,15 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maximum Arc</title>
+    <title>Maximum Arc | Fun Zone</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik+Mono+One&display=swap');
+        
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff00;
+        }
+        
         body {
             margin: 0;
             padding: 0;
             background-color: #000;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
         }
+        
         canvas {
             display: block;
             position: fixed;
@@ -19,6 +30,7 @@
             left: 0;
             z-index: 1;
         }
+        
         .button-container {
             position: absolute;
             top: 20px;
@@ -28,23 +40,59 @@
             flex-wrap: wrap;
             gap: 15px;
             z-index: 10;
+            justify-content: center;
+            max-width: 90%;
         }
+        
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
-            background-color: #333;
-            border: none;
-            color: white;
-            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            border-radius: 0;
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Press Start 2P', cursive;
             z-index: 10;
+            position: relative;
+            overflow: hidden;
         }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-green));
+            z-index: -1;
+            background-size: 400%;
+            opacity: 0;
+            transition: 0.5s;
+        }
+        
         button:hover {
-            background-color: #555;
-            transform: scale(1.1);
+            color: white;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.5);
         }
+        
+        button:hover::before {
+            opacity: 1;
+            animation: animate 3s linear infinite;
+        }
+        
+        @keyframes animate {
+            0% { background-position: 0 0; }
+            50% { background-position: 300% 0; }
+            100% { background-position: 0 0; }
+        }
+        
         .secret-button {
             position: fixed;
             top: 50%;
@@ -52,9 +100,20 @@
             transform: translate(-50%, -50%);
             padding: 15px 30px;
             font-size: 24px;
-            background-color: #6a3093;
+            background-color: rgba(106, 48, 147, 0.7);
+            border: 2px solid var(--neon-purple);
+            color: white;
             z-index: 5;
+            box-shadow: 0 0 15px var(--neon-purple);
+            animation: pulse 2s infinite;
         }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px var(--neon-purple); }
+            50% { box-shadow: 0 0 30px var(--neon-purple); }
+            100% { box-shadow: 0 0 15px var(--neon-purple); }
+        }
+        
         .secret-image {
             position: fixed;
             top: 0;
@@ -66,23 +125,65 @@
             display: none;
             z-index: 20;
         }
+        
         .back-button {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 100;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+        
+        .title {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--neon-pink);
+            font-size: 24px;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+            z-index: 10;
+            white-space: nowrap;
+            animation: titleGlow 2s infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
+            to { text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 45px var(--neon-purple); }
+        }
+        
+        .particle-trail {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
         }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
     
+    <div class="title">MAXIMUM ARC FUN ZONE</div>
+    
     <div class="button-container">
-        <button onclick="redirect('https://maximum-arc.github.io/main/lag-test/')">Lag Test</button>
-        <button onclick="redirect('https://maximum-arc.github.io/main/calculator/')">Calculator</button>
-        <button onclick="redirect('https://maximum-arc.github.io/main/notepad/')">Notepad</button>
-        <button onclick="redirect('https://maximum-arc.github.io/main/nbtM/')">Metadata Editor</button>
-        <button onclick="redirect('https://maximum-arc.github.io/main/files/')">Stuff</button>
+        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/lag-test/')">Lag Test</button>
+        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/calculator/')">Calculator</button>
+        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/notepad/')">Notepad</button>
+        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/files/')">Stuff</button>
+        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/runners/')">Runners Game</button>
         <button onclick="rickroll()">Rickroll</button>
     </div>
     
@@ -108,48 +209,80 @@
         });
 
         const particles = [];
-        const particleCount = 50;
+        const particleCount = 100;
+        const colors = ['#ff00ff', '#00ffff', '#ff9900', '#00ff00', '#9900ff'];
 
-        // Particle class
+        // Enhanced Particle class
         class Particle {
-            constructor(x, y, size, color, velocityX, velocityY) {
+            constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.size = size;
-                this.color = color;
-                this.velocityX = velocityX;
-                this.velocityY = velocityY;
+                this.size = Math.random() * 8 + 2;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.velocityX = (Math.random() - 0.5) * 4;
+                this.velocityY = (Math.random() - 0.5) * 4;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spinSpeed = (Math.random() - 0.5) * 0.1;
             }
 
             draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.alpha;
+                
+                // Draw different shapes randomly
+                if (Math.random() > 0.7) {
+                    // Star shape
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.lineTo(0, this.size);
+                        ctx.translate(0, this.size);
+                        ctx.rotate((Math.PI * 2) / 10);
+                        ctx.lineTo(0, -this.size / 2);
+                        ctx.translate(0, -this.size / 2);
+                        ctx.rotate((Math.PI * 6) / 10);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                } else {
+                    // Circle with gradient
+                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+                    gradient.addColorStop(0, this.color);
+                    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                    
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+                
+                ctx.restore();
             }
 
             update() {
                 this.x += this.velocityX;
                 this.y += this.velocityY;
-                this.size *= 0.95; // Particles shrink over time
+                this.alpha -= this.decay;
+                this.angle += this.spinSpeed;
+                this.velocityY += 0.05; // Gravity effect
             }
         }
 
-        function generateParticles(x, y) {
-            for (let i = 0; i < particleCount; i++) {
-                const size = Math.random() * 5 + 2;
-                const color = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.9)`;
-                const velocityX = (Math.random() - 0.5) * 2;
-                const velocityY = (Math.random() - 0.5) * 3;
-                particles.push(new Particle(x, y, size, color, velocityX, velocityY));
+        function generateParticles(x, y, count = particleCount) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y));
             }
         }
 
         function updateParticles() {
             for (let i = particles.length - 1; i >= 0; i--) {
                 const particle = particles[i];
-                if (particle.size <= 0.5) {
-                    particles.splice(i, 1); // Remove small particles
+                if (particle.alpha <= 0 || particle.y > canvas.height + 100) {
+                    particles.splice(i, 1);
                 } else {
                     particle.update();
                 }
@@ -157,7 +290,7 @@
         }
 
         function drawParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach((particle) => {
                 particle.draw();
             });
@@ -170,26 +303,71 @@
             requestAnimationFrame(animate);
         }
 
-        // Mouse and touch events
+        // Mouse and touch events with trail effect
+        let mouseX = 0, mouseY = 0;
+        
         canvas.addEventListener("mousemove", (event) => {
-            generateParticles(event.clientX, event.clientY);
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            generateParticles(mouseX, mouseY, 5);
+            
+            // Create trail effect
+            if (Math.random() > 0.7) {
+                generateParticles(
+                    mouseX + (Math.random() - 0.5) * 50,
+                    mouseY + (Math.random() - 0.5) * 50,
+                    2
+                );
+            }
         });
 
         canvas.addEventListener("touchmove", (event) => {
             const touch = event.touches[0];
-            generateParticles(touch.clientX, touch.clientY);
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
+            generateParticles(mouseX, mouseY, 10);
+            event.preventDefault();
         });
 
-        // Button actions
-        function redirect(url) {
-            window.location.href = url;
+        // Button actions with effects
+        function redirectWithEffect(url) {
+            // Create explosion effect
+            for (let i = 0; i < 150; i++) {
+                generateParticles(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height,
+                    1
+                );
+            }
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
         }
 
         function rickroll() {
-            window.location.href = "https://bit.ly/4hKgN58";
+            // Special effect for rickroll
+            for (let i = 0; i < 300; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                generateParticles(x, y, 1);
+            }
+            
+            setTimeout(() => {
+                window.location.href = "https://bit.ly/4hKgN58";
+            }, 800);
         }
 
         function showSecret() {
+            // Create rainbow explosion
+            for (let i = 0; i < 200; i++) {
+                generateParticles(
+                    canvas.width / 2 + (Math.random() - 0.5) * 200,
+                    canvas.height / 2 + (Math.random() - 0.5) * 200,
+                    1
+                );
+            }
+            
             secretImage.style.display = "block";
             secretAudio.play();
             
@@ -197,12 +375,22 @@
                 secretImage.style.display = "none";
                 secretAudio.pause();
                 secretAudio.currentTime = 0;
-                // location.reload(); // Alternative: refresh the page
             }, 3000);
         }
 
         // Start animation
         animate();
+
+        // Add random particles for background effect
+        setInterval(() => {
+            if (particles.length < 500) { // Limit total particles
+                generateParticles(
+                    Math.random() * canvas.width,
+                    -20,
+                    Math.floor(Math.random() * 3) + 1
+                );
+            }
+        }, 100);
     </script>
 </body>
 </html>
