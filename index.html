@@ -3,394 +3,678 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maximum Arc | Fun Zone</title>
+    <title>Maximum Arc | BIOS Fun Zone</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik+Mono+One&display=swap');
-        
-        :root {
-            --neon-pink: #ff00ff;
-            --neon-blue: #00ffff;
-            --neon-purple: #9d00ff;
-            --neon-green: #00ff00;
-        }
-        
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
-            color: white;
-        }
-        
-        canvas {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        
-        .button-container {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            z-index: 10;
-            justify-content: center;
-            max-width: 90%;
-        }
-        
-        button {
-            padding: 12px 24px;
+            background-color: #00007F;
+            color: #AAAAAA;
+            font-family: 'Courier New', monospace;
             font-size: 16px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
-            border-radius: 0;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0, 255, 255, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Press Start 2P', cursive;
-            z-index: 10;
-            position: relative;
+            line-height: 1.2;
             overflow: hidden;
+            cursor: none;
+            user-select: none;
         }
         
-        button::before {
-            content: '';
+        .bios-container {
+            padding: 20px;
+            text-shadow: 0 0 5px #00FFFF;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        
+        .header {
+            color: #FFFFFF;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #5555FF;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #5555FF;
+        }
+        
+        .tab {
+            padding: 5px 15px;
+            margin-right: 5px;
+            background-color: #000055;
+            border: 1px solid #5555FF;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            background-color: #0000AA;
+            color: #FFFFFF;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Selectable items */
+        .selectable {
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .selectable.selected {
+            background-color: #0000AA;
+            color: #FFFFFF !important;
+        }
+        
+        .selectable.selected::before {
+            content: ">";
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-green));
-            z-index: -1;
-            background-size: 400%;
-            opacity: 0;
-            transition: 0.5s;
+            left: 5px;
+            color: #FFFF00;
         }
         
-        button:hover {
-            color: white;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.5);
+        .selectable.selected a {
+            color: #FFFFFF !important;
         }
         
-        button:hover::before {
-            opacity: 1;
-            animation: animate 3s linear infinite;
+        .footer {
+            margin-top: 40px;
+            color: #5555FF;
+            font-size: 14px;
+            border-top: 1px solid #5555FF;
+            padding-top: 5px;
         }
         
-        @keyframes animate {
-            0% { background-position: 0 0; }
-            50% { background-position: 300% 0; }
-            100% { background-position: 0 0; }
+        .blink {
+            animation: blink 1s step-end infinite;
         }
         
-        .secret-button {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 15px 30px;
-            font-size: 24px;
-            background-color: rgba(106, 48, 147, 0.7);
-            border: 2px solid var(--neon-purple);
-            color: white;
-            z-index: 5;
-            box-shadow: 0 0 15px var(--neon-purple);
-            animation: pulse 2s infinite;
+        @keyframes blink {
+            50% { opacity: 0; }
         }
         
-        @keyframes pulse {
-            0% { box-shadow: 0 0 15px var(--neon-purple); }
-            50% { box-shadow: 0 0 30px var(--neon-purple); }
-            100% { box-shadow: 0 0 15px var(--neon-purple); }
+        /* BIOS boot animation */
+        @keyframes bios-boot {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
         }
         
-        .secret-image {
+        .bios-boot-message {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background-color: black;
-            display: none;
-            z-index: 20;
-        }
-        
-        .back-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            right: 0;
+            bottom: 0;
+            background-color: #00007F;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 100;
-            padding: 10px 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border: 2px solid var(--neon-green);
-            color: var(--neon-green);
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .back-button:hover {
-            background-color: rgba(0, 255, 0, 0.2);
-            box-shadow: 0 0 15px var(--neon-green);
-        }
-        
-        .title {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--neon-pink);
-            font-size: 24px;
-            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-            z-index: 10;
-            white-space: nowrap;
-            animation: titleGlow 2s infinite alternate;
-        }
-        
-        @keyframes titleGlow {
-            from { text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
-            to { text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 45px var(--neon-purple); }
-        }
-        
-        .particle-trail {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+            animation: bios-boot 3s forwards;
             pointer-events: none;
-            z-index: 5;
+        }
+        
+        /* Calculator styles */
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+        
+        .calculator-display {
+            grid-column: span 4;
+            background-color: #000055;
+            padding: 10px;
+            text-align: right;
+            border: 1px solid #5555FF;
+            margin-bottom: 5px;
+            height: 20px;
+        }
+        
+        .calculator button {
+            padding: 10px;
+            background-color: #000055;
+            border: 1px solid #5555FF;
+            color: #AAAAAA;
+        }
+        
+        /* Text editor styles */
+        .text-editor {
+            margin-top: 20px;
+        }
+        
+        .text-editor-toolbar {
+            margin-bottom: 5px;
+        }
+        
+        .text-editor-toolbar button {
+            padding: 5px 10px;
+            background-color: #000055;
+            border: 1px solid #5555FF;
+            color: #AAAAAA;
+            margin-right: 5px;
+        }
+        
+        .text-editor-area {
+            width: 100%;
+            height: 300px;
+            background-color: #000055;
+            border: 1px solid #5555FF;
+            color: #AAAAAA;
+            font-family: 'Courier New', monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+        }
+        
+        /* File browser styles */
+        .file-browser {
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            padding: 5px;
+            margin-bottom: 5px;
+            background-color: #000055;
+            border: 1px solid #5555FF;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .file-item a {
+            color: #AAAAAA;
+            text-decoration: none;
+        }
+        
+        /* System info styles */
+        .system-info {
+            margin-top: 20px;
+        }
+        
+        .info-row {
+            margin-bottom: 5px;
+            display: flex;
+        }
+        
+        .info-label {
+            color: #FFFF00;
+            min-width: 150px;
+        }
+        
+        .info-value {
+            color: #AAAAAA;
+        }
+        
+        .info-value a {
+            color: #00FFFF;
+            text-decoration: none;
+        }
+        
+        /* Download link styles */
+        .download-link {
+            color: #00FFFF;
+            text-decoration: none;
+            border-bottom: 1px dashed #00FFFF;
         }
     </style>
 </head>
 <body>
-    <canvas id="particleCanvas"></canvas>
-    
-    <div class="title">MAXIMUM ARC FUN ZONE</div>
-    
-    <div class="button-container">
-        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/lag-test/')">Lag Test</button>
-        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/calculator/')">Calculator</button>
-        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/notepad/')">Notepad</button>
-        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/files/')">Stuff</button>
-        <button onclick="redirectWithEffect('https://maximum-arc.github.io/main/runners/')">Runners Game</button>
-        <button onclick="rickroll()">Rickroll</button>
+    <div class="bios-boot-message">
+        <div>Maximum Arc BIOS v2.5</div>
+        <div>Copyright (C) 1993-2023, Maximum Arc Corp.</div>
+        <div>Memory Test: 65536K OK</div>
+        <div>Press DEL to enter SETUP...</div>
     </div>
     
-    <button class="secret-button" onclick="showSecret()">???</button>
-    <img id="secretImage" class="secret-image" src="https://maximum-arc.github.io/main/maxwell.jpg" alt="Secret">
-    <audio id="secretAudio" src="https://maximum-arc.github.io/main/maxwell.mp3"></audio>
-    
-    <button class="back-button" onclick="window.location.href='https://maximum-arc.github.io/main/'">Back to Main</button>
+    <div class="bios-container">
+        <div class="header">
+            <div>MAXIMUM ARC BIOS FUN ZONE</div>
+            <div>System Time: <span id="time">00:00:00</span></div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="info">System Info</div>
+            <div class="tab" data-tab="calculator">Calculator</div>
+            <div class="tab" data-tab="editor">Text Editor</div>
+            <div class="tab" data-tab="files">Files</div>
+        </div>
+        
+        <!-- System Info Tab -->
+        <div id="info" class="tab-content active">
+            <div class="system-info">
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">User Name:</div>
+                    <div class="info-value">Maksim</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">Minecraft Nick:</div>
+                    <div class="info-value">gamer_wq</div>
+                </div>
+                <div class="info-row selectable" data-action="github">
+                    <div class="info-label">GitHub:</div>
+                    <div class="info-value"><a href="https://github.com/maximum-arc" target="_blank" class="download-link">maximum-arc</a></div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">CPU:</div>
+                    <div class="info-value">Intel i5-13400F (16 cores)</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">GPU:</div>
+                    <div class="info-value">NVIDIA RTX 4070</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">Motherboard:</div>
+                    <div class="info-value">ASRock B760M Steel Legend WiFi</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">Keyboard:</div>
+                    <div class="info-value">Royal Kludge G65</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">Mouse:</div>
+                    <div class="info-value">Razer Basilisk v3</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">RAM:</div>
+                    <div class="info-value">32GB</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">OS:</div>
+                    <div class="info-value">Windows 11</div>
+                </div>
+                <div class="info-row selectable" data-action="none">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value">POCO X5 5G</div>
+                </div>
+                <div class="info-row selectable" data-action="secret">
+                    <div class="info-label">Special:</div>
+                    <div class="info-value"><span class="download-link">Secret Function</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calculator Tab -->
+        <div id="calculator" class="tab-content">
+            <div class="calculator">
+                <div class="calculator-display" id="calc-display">0</div>
+                <button class="selectable" onclick="calcInput('7')">7</button>
+                <button class="selectable" onclick="calcInput('8')">8</button>
+                <button class="selectable" onclick="calcInput('9')">9</button>
+                <button class="selectable" onclick="calcOperation('/')">/</button>
+                <button class="selectable" onclick="calcInput('4')">4</button>
+                <button class="selectable" onclick="calcInput('5')">5</button>
+                <button class="selectable" onclick="calcInput('6')">6</button>
+                <button class="selectable" onclick="calcOperation('*')">*</button>
+                <button class="selectable" onclick="calcInput('1')">1</button>
+                <button class="selectable" onclick="calcInput('2')">2</button>
+                <button class="selectable" onclick="calcInput('3')">3</button>
+                <button class="selectable" onclick="calcOperation('-')">-</button>
+                <button class="selectable" onclick="calcInput('0')">0</button>
+                <button class="selectable" onclick="calcInput('.')">.</button>
+                <button class="selectable" onclick="calcCalculate()">=</button>
+                <button class="selectable" onclick="calcOperation('+')">+</button>
+                <button class="selectable" onclick="calcClear()" style="grid-column: span 4;">CLEAR</button>
+            </div>
+        </div>
+        
+        <!-- Text Editor Tab -->
+        <div id="editor" class="tab-content">
+            <div class="text-editor">
+                <div class="text-editor-toolbar">
+                    <button class="selectable" onclick="editorSave()">Save</button>
+                    <button class="selectable" onclick="editorLoad()">Load</button>
+                    <button class="selectable" onclick="editorFormat()">Auto Format</button>
+                    <button class="selectable" onclick="editorClear()">Clear</button>
+                </div>
+                <textarea id="editor-area" class="text-editor-area" spellcheck="false"></textarea>
+            </div>
+        </div>
+        
+        <!-- Files Tab -->
+        <div id="files" class="tab-content">
+            <div class="file-browser">
+                <div class="file-item selectable" data-action="evil-portals">
+                    <a href="https://maximum-arc.github.io/main/files/EV.zip" download="Evil_Portals.zip" class="download-link">Evil Portals</a>
+                    <span>ZIP Archive</span>
+                </div>
+                <div class="file-item selectable" data-action="bad-usb">
+                    <a href="https://maximum-arc.github.io/main/files/BB.zip" download="Bad_USB.zip" class="download-link">Bad USB</a>
+                    <span>ZIP Archive</span>
+                </div>
+                <div class="file-item selectable" data-action="browse-files">
+                    <a href="https://maximum-arc.github.io/main/files/" target="_blank" class="download-link">Browse All Files</a>
+                    <span>Directory</span>
+                </div>
+                <div class="file-item selectable" data-action="rickroll">
+                    <a href="https://bit.ly/4hKgN58" class="download-link">Rickroll</a>
+                    <span>Special</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Use ARROW KEYS to navigate, ENTER to select, TAB to switch tabs<span class="blink">_</span>
+        </div>
+        
+        <div id="secret" style="display: none; margin-top: 20px; color: #FFFF00;">
+            SECRET BIOS ENTRY: MAXWELL CAT DETECTED
+            <div style="margin-top: 10px;">
+                <img src="https://maximum-arc.github.io/main/maxwell.jpg" alt="Secret" style="max-width: 200px; border: 1px solid #5555FF;">
+            </div>
+        </div>
+    </div>
 
     <script>
-        const canvas = document.getElementById("particleCanvas");
-        const ctx = canvas.getContext("2d");
-        const secretImage = document.getElementById("secretImage");
-        const secretAudio = document.getElementById("secretAudio");
-
-        // Canvas setup
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        const particles = [];
-        const particleCount = 100;
-        const colors = ['#ff00ff', '#00ffff', '#ff9900', '#00ff00', '#9900ff'];
-
-        // Enhanced Particle class
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.size = Math.random() * 8 + 2;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.velocityX = (Math.random() - 0.5) * 4;
-                this.velocityY = (Math.random() - 0.5) * 4;
-                this.alpha = 1;
-                this.decay = Math.random() * 0.02 + 0.01;
-                this.angle = Math.random() * Math.PI * 2;
-                this.spinSpeed = (Math.random() - 0.5) * 0.1;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-                ctx.globalAlpha = this.alpha;
-                
-                // Draw different shapes randomly
-                if (Math.random() > 0.7) {
-                    // Star shape
-                    ctx.beginPath();
-                    for (let i = 0; i < 5; i++) {
-                        ctx.lineTo(0, this.size);
-                        ctx.translate(0, this.size);
-                        ctx.rotate((Math.PI * 2) / 10);
-                        ctx.lineTo(0, -this.size / 2);
-                        ctx.translate(0, -this.size / 2);
-                        ctx.rotate((Math.PI * 6) / 10);
-                    }
-                    ctx.closePath();
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
+        // Navigation system
+        const selectableItems = document.querySelectorAll('.selectable');
+        const tabs = document.querySelectorAll('.tab');
+        let currentSelection = 0;
+        let currentTabIndex = 0;
+        
+        function updateSelection() {
+            // Get only visible selectable items in current tab
+            const visibleItems = Array.from(selectableItems).filter(item => {
+                return item.closest('.tab-content.active') !== null;
+            });
+            
+            visibleItems.forEach((item, index) => {
+                if (index === currentSelection) {
+                    item.classList.add('selected');
+                    // Scroll into view if needed
+                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 } else {
-                    // Circle with gradient
-                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
-                    gradient.addColorStop(0, this.color);
-                    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-                    
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = gradient;
-                    ctx.fill();
+                    item.classList.remove('selected');
                 }
-                
-                ctx.restore();
-            }
-
-            update() {
-                this.x += this.velocityX;
-                this.y += this.velocityY;
-                this.alpha -= this.decay;
-                this.angle += this.spinSpeed;
-                this.velocityY += 0.05; // Gravity effect
-            }
-        }
-
-        function generateParticles(x, y, count = particleCount) {
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle(x, y));
-            }
-        }
-
-        function updateParticles() {
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const particle = particles[i];
-                if (particle.alpha <= 0 || particle.y > canvas.height + 100) {
-                    particles.splice(i, 1);
-                } else {
-                    particle.update();
-                }
-            }
-        }
-
-        function drawParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((particle) => {
-                particle.draw();
             });
         }
-
-        // Animation loop
-        function animate() {
-            updateParticles();
-            drawParticles();
-            requestAnimationFrame(animate);
-        }
-
-        // Mouse and touch events with trail effect
-        let mouseX = 0, mouseY = 0;
         
-        canvas.addEventListener("mousemove", (event) => {
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-            generateParticles(mouseX, mouseY, 5);
+        function executeSelection() {
+            const visibleItems = Array.from(selectableItems).filter(item => {
+                return item.closest('.tab-content.active') !== null;
+            });
             
-            // Create trail effect
-            if (Math.random() > 0.7) {
-                generateParticles(
-                    mouseX + (Math.random() - 0.5) * 50,
-                    mouseY + (Math.random() - 0.5) * 50,
-                    2
-                );
+            const selectedItem = visibleItems[currentSelection];
+            const action = selectedItem.getAttribute('data-action');
+            
+            switch(action) {
+                case 'github':
+                    window.open('https://github.com/maximum-arc', '_blank');
+                    break;
+                case 'secret':
+                    showSecret();
+                    break;
+                case 'evil-portals':
+                    // Trigger download
+                    window.location.href = "https://maximum-arc.github.io/main/files/EV.zip";
+                    break;
+                case 'bad-usb':
+                    // Trigger download
+                    window.location.href = "https://maximum-arc.github.io/main/files/BB.zip";
+                    break;
+                case 'browse-files':
+                    window.open('https://maximum-arc.github.io/main/files/', '_blank');
+                    break;
+                case 'rickroll':
+                    window.location.href = "https://bit.ly/4hKgN58";
+                    break;
+                case 'none':
+                    // Do nothing
+                    break;
+                default:
+                    // Check if it's a button
+                    if (selectedItem.tagName === 'BUTTON') {
+                        selectedItem.click();
+                    }
+            }
+        }
+        
+        function switchTab(index) {
+            // Validate index
+            index = Math.max(0, Math.min(index, tabs.length - 1));
+            
+            // Update tabs
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                    document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                    document.getElementById(tab.getAttribute('data-tab')).classList.remove('active');
+                }
+            });
+            
+            currentTabIndex = index;
+            currentSelection = 0;
+            updateSelection();
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const visibleItemsCount = Array.from(selectableItems).filter(item => {
+                return item.closest('.tab-content.active') !== null;
+            }).length;
+            
+            // Navigation within current tab
+            if (e.key === 'ArrowUp') {
+                currentSelection = (currentSelection - 1 + visibleItemsCount) % visibleItemsCount;
+                updateSelection();
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown') {
+                currentSelection = (currentSelection + 1) % visibleItemsCount;
+                updateSelection();
+                e.preventDefault();
+            } else if (e.key === 'Enter') {
+                executeSelection();
+                e.preventDefault();
+            } else if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    switchTab(currentTabIndex - 1);
+                } else {
+                    switchTab(currentTabIndex + 1);
+                }
+                e.preventDefault();
+            }
+            
+            // Calculator keyboard support
+            if (document.querySelector('.tab-content.active').id === 'calculator') {
+                if (e.key >= '0' && e.key <= '9') {
+                    calcInput(e.key);
+                } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                    calcOperation(e.key);
+                } else if (e.key === 'Enter') {
+                    calcCalculate();
+                } else if (e.key === 'Escape') {
+                    calcClear();
+                } else if (e.key === '.') {
+                    calcInput('.');
+                }
             }
         });
-
-        canvas.addEventListener("touchmove", (event) => {
-            const touch = event.touches[0];
-            mouseX = touch.clientX;
-            mouseY = touch.clientY;
-            generateParticles(mouseX, mouseY, 10);
-            event.preventDefault();
-        });
-
-        // Button actions with effects
-        function redirectWithEffect(url) {
-            // Create explosion effect
-            for (let i = 0; i < 150; i++) {
-                generateParticles(
-                    Math.random() * canvas.width,
-                    Math.random() * canvas.height,
-                    1
-                );
-            }
-            
-            setTimeout(() => {
-                window.location.href = url;
-            }, 500);
+        
+        // Initialize
+        switchTab(0);
+        updateSelection();
+        
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', {hour12: false});
+            document.getElementById('time').textContent = timeStr;
         }
-
-        function rickroll() {
-            // Special effect for rickroll
-            for (let i = 0; i < 300; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                generateParticles(x, y, 1);
-            }
-            
-            setTimeout(() => {
-                window.location.href = "https://bit.ly/4hKgN58";
-            }, 800);
-        }
-
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Secret function
         function showSecret() {
-            // Create rainbow explosion
-            for (let i = 0; i < 200; i++) {
-                generateParticles(
-                    canvas.width / 2 + (Math.random() - 0.5) * 200,
-                    canvas.height / 2 + (Math.random() - 0.5) * 200,
-                    1
-                );
-            }
+            const secret = document.getElementById('secret');
+            secret.style.display = secret.style.display === 'none' ? 'block' : 'none';
             
-            secretImage.style.display = "block";
-            secretAudio.play();
-            
-            setTimeout(() => {
-                secretImage.style.display = "none";
-                secretAudio.pause();
-                secretAudio.currentTime = 0;
-            }, 3000);
+            // Play secret sound
+            const audio = new Audio('https://maximum-arc.github.io/main/maxwell.mp3');
+            audio.play();
         }
-
-        // Start animation
-        animate();
-
-        // Add random particles for background effect
-        setInterval(() => {
-            if (particles.length < 500) { // Limit total particles
-                generateParticles(
-                    Math.random() * canvas.width,
-                    -20,
-                    Math.floor(Math.random() * 3) + 1
-                );
+        
+        // Calculator functionality
+        let calcValue = '0';
+        let currentOperation = null;
+        let calcPrevValue = '0';
+        
+        function updateCalcDisplay() {
+            document.getElementById('calc-display').textContent = calcValue;
+        }
+        
+        function calcInput(num) {
+            if (calcValue === '0' || currentOperation === '=') {
+                calcValue = num;
+                if (currentOperation === '=') currentOperation = null;
+            } else {
+                calcValue += num;
             }
-        }, 100);
+            updateCalcDisplay();
+        }
+        
+        function calcOperation(op) {
+            if (currentOperation && currentOperation !== '=') {
+                calcCalculate();
+            }
+            calcPrevValue = calcValue;
+            calcValue = '0';
+            currentOperation = op;
+        }
+        
+        function calcCalculate() {
+            let result;
+            const prev = parseFloat(calcPrevValue);
+            const current = parseFloat(calcValue);
+            
+            switch (currentOperation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            
+            calcValue = result.toString();
+            currentOperation = '=';
+            updateCalcDisplay();
+        }
+        
+        function calcClear() {
+            calcValue = '0';
+            currentOperation = null;
+            calcPrevValue = '0';
+            updateCalcDisplay();
+        }
+        
+        // Text editor functionality
+        function editorSave() {
+            const text = document.getElementById('editor-area').value;
+            localStorage.setItem('biosEditorText', text);
+            alert('Text saved to browser storage');
+        }
+        
+        function editorLoad() {
+            const savedText = localStorage.getItem('biosEditorText');
+            if (savedText) {
+                document.getElementById('editor-area').value = savedText;
+                alert('Text loaded from browser storage');
+            } else {
+                alert('No saved text found');
+            }
+        }
+        
+        function editorClear() {
+            if (confirm('Clear editor contents?')) {
+                document.getElementById('editor-area').value = '';
+            }
+        }
+        
+        function editorFormat() {
+            const editor = document.getElementById('editor-area');
+            const text = editor.value;
+            
+            // Simple auto-indent for common languages
+            if (text.includes('<html>') || text.includes('<body>')) {
+                // HTML formatting
+                let formatted = text
+                    .replace(/(<[^>]+>)/g, '\n$1\n')
+                    .replace(/\n\n/g, '\n')
+                    .replace(/^\s+/gm, '');
+                
+                let indent = 0;
+                formatted = formatted.split('\n').map(line => {
+                    if (line.match(/<\/[^>]+>/) && !line.match(/<[^/][^>]*>/)) {
+                        indent = Math.max(0, indent - 4);
+                    }
+                    
+                    const indentedLine = ' '.repeat(indent) + line;
+                    
+                    if (line.match(/<[^/][^>]*>/) && !line.match(/<\/[^>]+>/)) {
+                        indent += 4;
+                    }
+                    
+                    return indentedLine;
+                }).join('\n');
+                
+                editor.value = formatted.trim();
+            } else if (text.includes('function') || text.includes('{') || text.includes('}')) {
+                // JavaScript formatting
+                let indent = 0;
+                const formatted = text.split('\n').map(line => {
+                    line = line.trim();
+                    
+                    if (line.endsWith('}')) {
+                        indent = Math.max(0, indent - 4);
+                    }
+                    
+                    const indentedLine = ' '.repeat(indent) + line;
+                    
+                    if (line.endsWith('{')) {
+                        indent += 4;
+                    }
+                    
+                    return indentedLine;
+                }).join('\n');
+                
+                editor.value = formatted;
+            } else {
+                // Basic indentation for other text
+                editor.value = text.replace(/^\s+/gm, '')
+                    .replace(/\n\n+/g, '\n\n')
+                    .replace(/([.?!])\s+/g, '$1\n\n');
+            }
+        }
     </script>
 </body>
 </html>
