@@ -1,10 +1,13 @@
 # 🚀 Unrestricted Chatbot — Groq AI  
 
-### ⚡ Overview  
+### Overview  
 This chatbot provides unrestricted AI interactions powered by **Groq API**. Designed for users who need **fast, uncensored responses** without limitations.  
 
-### 🔗 Hosted on Maximum-Arc  
+### This works ONLY for code
+if not working, send to AI "/reload"
+
+### Hosted on Maximum-Arc  
 Live version available at: [maximum-arc.github.io/main/unrestricted/](https://maximum-arc.github.io/main/unrestricted/)  
 
-### ⚠ Disclaimer  
+### Disclaimer  
 This chatbot **removes conventional content restrictions**, so use responsibly.  
