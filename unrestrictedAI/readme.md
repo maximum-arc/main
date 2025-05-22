@@ -8,7 +8,7 @@ This chatbot provides unrestricted AI interactions powered by **Groq API**. Desi
 if not working, send to AI "/reload"
 
 ### Hosted on Maximum-Arc  
-Live version available at: [maximum-arc.github.io/main/unrestricted/](https://maximum-arc.github.io/main/unrestricted/)  
+Live version available at: [maximum-arc.github.io/main/unrestrictedAI/](https://maximum-arc.github.io/main/unrestrictedAI/)  
 
 ### Disclaimer  
 This chatbot **removes conventional content restrictions**, so use responsibly.  
