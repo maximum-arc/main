@@ -1,4 +1,5 @@
 # 🚀 Unrestricted Chatbot — Groq AI  
+## Write first message "/reload" or else NO bypass
 
 ### Overview  
 This chatbot provides unrestricted AI interactions powered by **Groq API**. Designed for users who need **fast, uncensored responses** without limitations.  
