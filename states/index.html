@@ -5,58 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статья</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            color: #333;
-        }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1 { color: #444; }
         .content { margin-top: 20px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div id="article">
         <h1 id="title">Загрузка...</h1>
         <div id="content" class="content">Загрузка данных...</div>
+        <div id="ip-info" class="hidden"></div>
     </div>
 
     <script>
-        // Парсинг Base64 из URL
         const urlParams = new URLSearchParams(window.location.search);
         const encodedData = urlParams.get('data');
         
         if (encodedData) {
             try {
-                // Декодируем данные
                 const decodedData = atob(encodedData);
-                
-                // Разбираем параметры (id=...,title=...,state=...,chat_id=...)
                 const params = {};
                 decodedData.split(',').forEach(pair => {
                     const [key, value] = pair.split('=');
                     params[key] = value;
                 });
                 
-                // Устанавливаем заголовок и текст
                 document.getElementById('title').textContent = params['title'] || 'Без названия';
                 document.getElementById('content').textContent = params['state'] || 'Нет содержимого';
                 
-                // Отправляем уведомление в Telegram (если есть chat_id)
                 if (params['chat_id']) {
-                    fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${params['chat_id']}&text=🚀 Кто-то открыл вашу статью!`);
+                    fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${params['chat_id']}&text=📡 Кто-то открыл статью!\nIP: ${params['ip'] || 'N/A'}`);
                 }
                 
             } catch (e) {
-                console.error("Ошибка декодирования:", e);
+                console.error("Ошибка:", e);
                 document.getElementById('title').textContent = "Ошибка";
-                document.getElementById('content').textContent = "Неверные данные в ссылке.";
+                document.getElementById('content').textContent = "Неверные данные.";
             }
-        } else {
-            document.getElementById('title').textContent = "Ошибка";
-            document.getElementById('content').textContent = "Данные не переданы.";
         }
     </script>
 </body>
