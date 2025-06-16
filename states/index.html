@@ -35,13 +35,7 @@
                 document.getElementById('content').textContent = params['state'] || 'Нет содержимого';
                 
                 // Отображаем дополнительную информацию
-                const infoDiv = document.getElementById('info');
-                infoDiv.innerHTML = `
-                    <p>IP: ${params['ip'] || 'N/A'}</p>
-                    <p>Страна: ${params['country'] || 'N/A'}</p>
-                    <p>Город: ${params['city'] || 'N/A'}</p>
-                    <p>Платформа: ${params['platform'] || 'N/A'}</p>
-                `;
+                
                 
                 // Отправляем уведомление в Telegram
                 if (params['chat_id']) {
